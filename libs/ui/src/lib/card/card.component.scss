@@ -1,4 +1,5 @@
 :host {
   display: block;
-  @apply p-5 border rounded;
+  @apply p-5 border rounded transform hover:-translate-y-1.5 bg-white transition ease-linear duration-300 cursor-pointer;
+  @apply hover:shadow-md text-gray-500;
 }
