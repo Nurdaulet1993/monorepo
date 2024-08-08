@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CardComponent, TabItemComponent, TabsComponent } from '@ui';
 
@@ -9,6 +9,14 @@ import { CardComponent, TabItemComponent, TabsComponent } from '@ui';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'app';
+
+  index = 1;
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.index = 2;
+    }, 3000)
+  }
 }
