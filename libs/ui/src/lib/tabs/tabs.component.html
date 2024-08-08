@@ -16,11 +16,8 @@
   </div>
 
   <div class="header-label">
-    @for (tab of tabs; track tab; let i = $index) {
-
-      <button class="tab-button"
-        (click)="currentTab = tabs.get(i)?.templateRef() ?? null"
-      >
+    @for (tab of tabItems(); track tab; let i = $index) {
+      <button class="tab-button" [class.active]="(selectedIndex$ | async) === i" (click)="selectIndex(i)">
         {{ tab.label() }}
       </button>
     }
@@ -29,5 +26,6 @@
 
 
 <div class="px-4">
-    <ng-container [ngTemplateOutlet]="currentTab ?? null"></ng-container>
+    <ng-container [ngTemplateOutlet]="currentTabTemplate$ | async"></ng-container>
 </div>
+
