@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CardComponent, TabItemComponent, TabsComponent } from '@ui';
+import { CardComponent, TabItemComponent, TabsComponent, TabsTitleDirective } from '@ui';
 
 @Component({
   standalone: true,
-  imports: [RouterModule, CardComponent, TabsComponent, TabItemComponent],
+  imports: [RouterModule, CardComponent, TabsComponent, TabItemComponent, TabsTitleDirective],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
