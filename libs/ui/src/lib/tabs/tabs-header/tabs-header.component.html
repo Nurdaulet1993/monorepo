@@ -1,19 +1,25 @@
 <ng-content></ng-content>
 
-<div class="header-label flex overflow-x-auto" #scrollContainer>
-  @for (tab of tabItems(); track tab; let i = $index) {
+<div class="cdk-virtual-scroll-data-source-example">
+  <cdk-virtual-scroll-viewport orientation="horizontal"
+                               itemSize="3"
+                               class="example-viewport"
+                               (scrolledIndexChange)="onScroll()"
+  >
+    <!--  @for (tab of tabItems(); track tab; let i = $index) {-->
     <button class="tab-button"
-            [class.active]="(selectedIndex$ | async) === i"
-            (click)="setNewSelectedIndex(i)"
+            *cdkVirtualFor="let tab of tabItems()"
+            (click)="scroll(tabItems().length - 1)"
     >
       {{ tab.label() }}
     </button>
-  }
+    <!--  }-->
+  </cdk-virtual-scroll-viewport>
+
 </div>
 
-<button class="bg-gray-600 p-2 rounded flex justify-center disabled:bg-amber-800"
-        [disabled]="!isScrollable()"
-        (click)="scroll()"
+<button class="bg-gray-600 p-2 rounded flex justify-center disabled:opacity-40"
+        (click)="scroll(300)"
 >
   <svg xmlns="http://www.w3.org/2000/svg"
        fill="none" viewBox="0 0 24 24"

@@ -1,6 +1,8 @@
 :host {
   @apply p-3 text-gray-400 grid grid-cols-[max-content_1fr_50px] items-center gap-4;
   background: #222222;
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
 }
 
 .tab-button {
@@ -22,3 +24,20 @@
     display: none;
   }
 }
+
+.example-viewport {
+  height: 200px;
+  width: 100%;
+  border: 1px solid black;
+}
+
+
+
+
+
+.cdk-virtual-scroll-data-source-example .example-viewport .cdk-virtual-scroll-content-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
