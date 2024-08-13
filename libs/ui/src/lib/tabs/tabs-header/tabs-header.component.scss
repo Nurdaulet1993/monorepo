@@ -1,0 +1,25 @@
+:host {
+  @apply p-3 text-gray-400 grid grid-cols-[max-content_1fr_max-content] items-center gap-4;
+  background: #222222;
+}
+
+.btn {
+  @apply inline-block px-4 py-2 bg-gray-950 border border-gray-400 text-gray-400 text-left me-2 flex-shrink-0 flex-grow-0;
+  @apply transition ease-linear decoration-amber-200;
+  width: 240px;
+  height: 43px;
+
+
+  &.active, &:hover {
+    background: #333333;
+    border-color: #333333;
+  }
+}
+
+.btn-list {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

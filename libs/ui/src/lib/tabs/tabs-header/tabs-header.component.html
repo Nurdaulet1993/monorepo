@@ -1,0 +1,9 @@
+<p>Администрирование</p>
+
+<div ui-scroll="400" #scroll="uiScroll" class="btn-list">
+  @for (tab of tabItems; track tab.label; let i = $index) {
+    <button class="btn line-clamp-1" (click)="onSelect(i)">{{ tab.label }}</button>
+  }
+</div>
+
+<button (click)="scroll.scrollLeft()">next</button>

@@ -1,0 +1,5 @@
+<ui-tabs-header [tabItems]="tabItems"></ui-tabs-header>
+
+@for (tab of tabItems; track tab.label) {
+  <p>{{ tab.label }}</p>
+}
