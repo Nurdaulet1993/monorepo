@@ -1,5 +1,9 @@
-<ui-tabs-header [tabItems]="tabItems"></ui-tabs-header>
+<ui-tabs-header [tabItems]="tabItems"
+                (select)="onSelectIndex($event)"
+                [selectedIndex]="selectedIndex$ | async"
 
-@for (tab of tabItems; track tab.label) {
-  <p>{{ tab.label }}</p>
-}
+>
+  <p>Администрирование</p>
+</ui-tabs-header>
+
+<ng-container [ngTemplateOutlet]="(currentTab$ | async) ?? null"></ng-container>

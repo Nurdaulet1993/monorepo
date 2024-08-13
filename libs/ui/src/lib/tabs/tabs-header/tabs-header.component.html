@@ -1,8 +1,13 @@
-<p>Администрирование</p>
+<ng-content></ng-content>
 
-<div ui-scroll="400" #scroll="uiScroll" class="btn-list">
+<div ui-scroll="700" #scroll="uiScroll" class="btn-list">
   @for (tab of tabItems; track tab.label; let i = $index) {
-    <button class="btn line-clamp-1" (click)="onSelect(i)">{{ tab.label }}</button>
+    <button class="btn line-clamp-1"
+            (click)="onSelect(i)"
+            [class.active]="selectedIndex === i"
+    >
+      {{ tab.label }}
+    </button>
   }
 </div>
 

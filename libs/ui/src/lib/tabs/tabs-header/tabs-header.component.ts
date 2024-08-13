@@ -13,6 +13,7 @@ import { ScrollDirective } from '../scroll.directive';
 })
 export class TabsHeaderComponent implements OnInit {
   @Input({ required: true }) tabItems!: QueryList<TabsItemComponent>;
+  @Input({ required: true }) selectedIndex: number | null = null;
   @Output() select = new EventEmitter<number>();
 
   ngOnInit(): void {}

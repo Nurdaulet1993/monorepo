@@ -9,7 +9,7 @@ import { Directive, ElementRef, HostListener, inject, Input, numberAttribute, Re
   exportAs: 'uiScroll'
 })
 export class ScrollDirective {
-  @Input({ transform: numberAttribute }) size: number = 250;
+  @Input({ transform: numberAttribute, alias: 'ui-scroll' }) size: number = 250;
   element = inject(ElementRef);
   isDown =  false;
   startX = 0;
@@ -17,7 +17,7 @@ export class ScrollDirective {
   private renderer = inject(Renderer2)
 
   scrollLeft() {
-    (<HTMLDivElement>this.element.nativeElement).scrollLeft += this.size;
+    this.element.nativeElement.scrollLeft += this.size;
   }
 
   @HostListener('mousedown', ['$event'])
