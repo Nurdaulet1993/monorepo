@@ -13,7 +13,7 @@ import { User } from './user';
 })
 export class AppComponent implements OnInit {
   title = 'app';
-  selectValue = 1;
+
   private cdr = inject(ChangeDetectorRef);
   users: User[] = [
     new User(1, 'Albert Einstein', 'albert', 'Germany/USA'),
@@ -27,6 +27,11 @@ export class AppComponent implements OnInit {
     new User(9, 'Richard Feynman', 'richard', 'USA'),
     new User(10, 'Ernest Rutherford', 'ernest', 'New Zealand'),
   ];
+  selectValue: User = this.users[3];
+
+  displayWith(user: User): string {
+    return user.name;
+  }
 
   onOpen() {
     console.log('Opened');
@@ -36,20 +41,20 @@ export class AppComponent implements OnInit {
     console.log('Closed');
   }
 
-  onSelect(value: SelectValue<number>) {
+  onSelect(value: SelectValue<User>) {
     console.log('"Selected value":', value)
   }
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.selectValue = 9;
-      this.users = [
-        new User(7, 'James Clerk Maxwell', 'james', 'United Kingdom'),
-        new User(8, 'Michael Faraday', 'michael', 'United Kingdom'),
-        new User(9, 'Richard Feynman', 'richard', 'USA'),
-        new User(10, 'Ernest Rutherford', 'ernest', 'New Zealand'),
-      ]
-      this.cdr.markForCheck()
-    }, 5000)
+    // setTimeout(() => {
+    //   this.selectValue = new User(8, 'Michael Faraday', 'michael', 'United Kingdom');
+    //   this.users = [
+    //     new User(7, 'James Clerk Maxwell', 'james', 'United Kingdom'),
+    //     new User(8, 'Michael Faraday', 'michael', 'United Kingdom'),
+    //     new User(9, 'Richard Feynman', 'richard', 'USA'),
+    //     new User(10, 'Ernest Rutherford', 'ernest', 'New Zealand'),
+    //   ]
+    //   this.cdr.markForCheck()
+    // }, 5000)
   }
 }

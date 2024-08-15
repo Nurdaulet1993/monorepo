@@ -42,15 +42,17 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy {
   @Input() label: string = 'Select value ...';
   @Input()
   set value (value: SelectValue<T>) {
-    if (!value) return;
     this.selectionModel.clear();
-    this.selectionModel.select(value);
+    if (value) {
+      this.selectionModel.select(value);
+    }
   }
   get value(): SelectValue<T> {
     if (this.selectionModel.isEmpty()) return null;
     return this.selectionModel.selected[0]
   }
   @Input() isOpen = false;
+  @Input() displayWith: ((value: T) => string | number) | null = null;
   @Output() opened = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
   @Output() selectionChanged = new EventEmitter<SelectValue<T>>();
@@ -58,6 +60,14 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy {
   private selectionModel = new SelectionModel<T>();
   private unsubscribe$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
+
+  protected get displayValue() {
+    if (this.displayWith && this.value) {
+      return this.displayWith(this.value);
+    }
+
+    return this.value;
+  }
 
   open(): void {
     this.isOpen = true;
@@ -112,6 +122,4 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy {
     }
     this.close();
   }
-
-
 }
