@@ -3,7 +3,7 @@ import {
   Component,
   ContentChildren,
   EventEmitter,
-  Input,
+  Input, OnDestroy,
   Output,
   output,
   QueryList
@@ -11,6 +11,8 @@ import {
 import { OverlayModule } from '@angular/cdk/overlay';
 import { animate, AnimationEvent, state, style, transition, trigger } from '@angular/animations';
 import { OptionComponent } from './option/option.component';
+import { SelectionModel } from '@angular/cdk/collections';
+import { merge, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'ui-select',
@@ -32,13 +34,25 @@ import { OptionComponent } from './option/option.component';
     ])
   ]
 })
-export class SelectComponent implements AfterContentInit {
+export class SelectComponent implements AfterContentInit, OnDestroy {
   @Input() label: string = 'Select value ...';
-  @Input() value: string | null = null;
+  @Input()
+  set value (value: string | null) {
+    if (!value) return;
+    this.selectionModel.clear();
+    this.selectionModel.select(value);
+  }
+  get value() {
+    if (this.selectionModel.isEmpty()) return null;
+    return this.selectionModel.selected[0]
+  }
   @Input() isOpen = false;
   @Output() opened = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
+  @Output() selectionChanged = new EventEmitter<string | null>();
   @ContentChildren(OptionComponent, { descendants: true }) options!: QueryList<OptionComponent>;
+  private selectionModel = new SelectionModel<string>();
+  private unsubscribe$ = new Subject<void>();
 
   open(): void {
     this.isOpen = true;
@@ -54,7 +68,26 @@ export class SelectComponent implements AfterContentInit {
   }
 
   ngAfterContentInit(): void {
-    this.highlightSelectedOption(this.value)
+    this.highlightSelectedOption(this.value);
+    this.selectionModel.changed
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(values => {
+        values.removed.forEach(value => this.findOptionByValue(value)?.deselect());
+        values.added.forEach(value => this.findOptionByValue(value)?.highlightAsSelected()); // If value changes after some time
+      })
+
+    this.options.changes
+      .pipe(
+        startWith<QueryList<OptionComponent>>(this.options),
+        switchMap(options => merge(...options.map(o => o.selected))),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((selectedOption: OptionComponent) => this.handleSelection(selectedOption))
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   private highlightSelectedOption(value: string | null) {
@@ -64,4 +97,14 @@ export class SelectComponent implements AfterContentInit {
   private findOptionByValue(value: string | null): OptionComponent | undefined {
     return this.options && this.options.find(option => option.value === value);
   }
+
+  private handleSelection(option: OptionComponent): void {
+    if (option.value) {
+      this.selectionModel.toggle(option.value);
+      this.selectionChanged.emit(this.value);
+    }
+    this.close();
+  }
+
+
 }

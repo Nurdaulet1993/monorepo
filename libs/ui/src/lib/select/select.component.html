@@ -1,5 +1,9 @@
 <div class="control" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
-  <div class="label">{{ label }}</div>
+  @if (value) {
+    {{ value }}
+  } @else {
+    <div class="label">{{ label }}</div>
+  }
 </div>
 
 <ng-template cdkConnectedOverlay

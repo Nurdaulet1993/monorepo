@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CardComponent, OptionComponent, SelectComponent, TabsItemComponent } from '@ui';
-import { TabsComponent } from '@ui';
+import { CardComponent, OptionComponent, SelectComponent, TabsComponent, TabsItemComponent } from '@ui';
 
 @Component({
   standalone: true,
@@ -10,8 +9,10 @@ import { TabsComponent } from '@ui';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'app';
+  selectValue = '1';
+  private cdr = inject(ChangeDetectorRef)
 
   onOpen() {
     console.log('Opened');
@@ -19,5 +20,16 @@ export class AppComponent {
 
   onClosed() {
     console.log('Closed');
+  }
+
+  onSelect(value: string | null) {
+    console.log('"Selected value":', value)
+  }
+
+  ngOnInit(): void {
+    // setTimeout(() => {
+    //   this.selectValue = '3';
+    //   this.cdr.detectChanges()
+    // }, 2000)
   }
 }

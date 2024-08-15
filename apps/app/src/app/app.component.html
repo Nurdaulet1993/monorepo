@@ -1,7 +1,9 @@
 <div class="container">
   <div class="w-80">
-    <ui-select value="3" (opened)="onOpen()"
+    <ui-select [value]="selectValue"
+               (opened)="onOpen()"
                (closed)="onClosed()"
+               (selectionChanged)="onSelect($event)"
     >
       <ui-option value="1">Placeholder value 1</ui-option>
       <ui-option value="2" disabled>Placeholder value 2</ui-option>
