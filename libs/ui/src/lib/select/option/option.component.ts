@@ -19,12 +19,16 @@ export class OptionComponent {
   @Output() selected = new EventEmitter<OptionComponent>();
   protected isSelected = false;
 
-  select(): void {
+  protected select(): void {
     if (this.isDisabled) return;
-    this.isSelected = true;
+    this.highlightAsSelected();
     this.selected.emit(this);
   }
   deselect(): void {
     this.isSelected = false;
+  }
+
+  highlightAsSelected(): void {
+    this.isSelected = true;
   }
 }
