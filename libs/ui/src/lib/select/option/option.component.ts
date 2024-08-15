@@ -1,4 +1,13 @@
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  Output
+} from '@angular/core';
 
 @Component({
   selector: 'ui-option',
@@ -11,13 +20,15 @@ import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angul
     '[class.selected]': 'isSelected',
     '[class.disabled]': 'isDisabled',
     '(click)': 'select()'
-  }
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OptionComponent {
-  @Input() value: string | null = null;
+export class OptionComponent<T> {
+  @Input() value: T | null = null;
   @Input({ transform: booleanAttribute, alias: 'disabled' }) isDisabled = false;
-  @Output() selected = new EventEmitter<OptionComponent>();
+  @Output() selected = new EventEmitter<OptionComponent<T>>();
   protected isSelected = false;
+  private cdr = inject(ChangeDetectorRef);
 
   protected select(): void {
     if (this.isDisabled) return;
@@ -26,9 +37,11 @@ export class OptionComponent {
   }
   deselect(): void {
     this.isSelected = false;
+    this.cdr.markForCheck();
   }
 
   highlightAsSelected(): void {
     this.isSelected = true;
+    this.cdr.markForCheck();
   }
 }

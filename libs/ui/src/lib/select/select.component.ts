@@ -1,18 +1,21 @@
 import {
   AfterContentInit,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ContentChildren,
-  EventEmitter,
-  Input, OnDestroy,
+  EventEmitter, inject,
+  Input,
+  OnDestroy,
   Output,
-  output,
   QueryList
 } from '@angular/core';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { animate, AnimationEvent, state, style, transition, trigger } from '@angular/animations';
 import { OptionComponent } from './option/option.component';
 import { SelectionModel } from '@angular/cdk/collections';
-import { merge, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { merge, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
+
+export type SelectValue<T> = T | null;
 
 @Component({
   selector: 'ui-select',
@@ -32,27 +35,29 @@ import { merge, startWith, Subject, switchMap, takeUntil } from 'rxjs';
       transition(':enter', [animate('320ms cubic-bezier(0, 1, 0.45, 1.34)')]),
       transition(':leave', [animate('220ms cubic-bezier(0.88,-0.7, 0.86, 0.85)')]),
     ])
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SelectComponent implements AfterContentInit, OnDestroy {
+export class SelectComponent<T> implements AfterContentInit, OnDestroy {
   @Input() label: string = 'Select value ...';
   @Input()
-  set value (value: string | null) {
+  set value (value: SelectValue<T>) {
     if (!value) return;
     this.selectionModel.clear();
     this.selectionModel.select(value);
   }
-  get value() {
+  get value(): SelectValue<T> {
     if (this.selectionModel.isEmpty()) return null;
     return this.selectionModel.selected[0]
   }
   @Input() isOpen = false;
   @Output() opened = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
-  @Output() selectionChanged = new EventEmitter<string | null>();
-  @ContentChildren(OptionComponent, { descendants: true }) options!: QueryList<OptionComponent>;
-  private selectionModel = new SelectionModel<string>();
+  @Output() selectionChanged = new EventEmitter<SelectValue<T>>();
+  @ContentChildren(OptionComponent, { descendants: true }) options!: QueryList<OptionComponent<T>>;
+  private selectionModel = new SelectionModel<T>();
   private unsubscribe$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef);
 
   open(): void {
     this.isOpen = true;
@@ -60,6 +65,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
 
   close(): void {
     this.isOpen = false;
+    this.cdr.markForCheck();
   }
 
   onPanelAnimationDone({ fromState, toState }: AnimationEvent): void {
@@ -68,7 +74,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   }
 
   ngAfterContentInit(): void {
-    this.highlightSelectedOption(this.value);
+
     this.selectionModel.changed
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(values => {
@@ -78,11 +84,12 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
 
     this.options.changes
       .pipe(
-        startWith<QueryList<OptionComponent>>(this.options),
+        startWith<QueryList<OptionComponent<T>>>(this.options),
+        tap(() => queueMicrotask(() => this.highlightSelectedOption(this.value))),
         switchMap(options => merge(...options.map(o => o.selected))),
         takeUntil(this.unsubscribe$)
       )
-      .subscribe((selectedOption: OptionComponent) => this.handleSelection(selectedOption))
+      .subscribe((selectedOption: OptionComponent<T>) => this.handleSelection(selectedOption))
   }
 
   ngOnDestroy(): void {
@@ -90,15 +97,15 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  private highlightSelectedOption(value: string | null) {
+  private highlightSelectedOption(value: SelectValue<T>) {
     this.findOptionByValue(value)?.highlightAsSelected();
   }
 
-  private findOptionByValue(value: string | null): OptionComponent | undefined {
+  private findOptionByValue(value: SelectValue<T>): OptionComponent<T> | undefined {
     return this.options && this.options.find(option => option.value === value);
   }
 
-  private handleSelection(option: OptionComponent): void {
+  private handleSelection(option: OptionComponent<T>): void {
     if (option.value) {
       this.selectionModel.toggle(option.value);
       this.selectionChanged.emit(this.value);

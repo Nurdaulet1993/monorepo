@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CardComponent, OptionComponent, SelectComponent, TabsComponent, TabsItemComponent } from '@ui';
+import { CardComponent, OptionComponent, SelectComponent, TabsComponent, TabsItemComponent, SelectValue } from '@ui';
+import { User } from './user';
 
 @Component({
   standalone: true,
@@ -8,11 +9,24 @@ import { CardComponent, OptionComponent, SelectComponent, TabsComponent, TabsIte
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   title = 'app';
-  selectValue = '1';
-  private cdr = inject(ChangeDetectorRef)
+  selectValue = 1;
+  private cdr = inject(ChangeDetectorRef);
+  users: User[] = [
+    new User(1, 'Albert Einstein', 'albert', 'Germany/USA'),
+    new User(2, 'Niels Bohr', 'niels', 'Denmark'),
+    new User(3, 'Marie Curie', 'marie', 'Poland/French'),
+    new User(4, 'Isaac Newton', 'isaac', 'United Kingdom'),
+    new User(5, 'Stephen Hawking', 'stephen', 'United Kingdom', true),
+    new User(6, 'Max Planck', 'max', 'Germany'),
+    new User(7, 'James Clerk Maxwell', 'james', 'United Kingdom'),
+    new User(8, 'Michael Faraday', 'michael', 'United Kingdom'),
+    new User(9, 'Richard Feynman', 'richard', 'USA'),
+    new User(10, 'Ernest Rutherford', 'ernest', 'New Zealand'),
+  ];
 
   onOpen() {
     console.log('Opened');
@@ -22,14 +36,20 @@ export class AppComponent implements OnInit {
     console.log('Closed');
   }
 
-  onSelect(value: string | null) {
+  onSelect(value: SelectValue<number>) {
     console.log('"Selected value":', value)
   }
 
   ngOnInit(): void {
-    // setTimeout(() => {
-    //   this.selectValue = '3';
-    //   this.cdr.detectChanges()
-    // }, 2000)
+    setTimeout(() => {
+      this.selectValue = 9;
+      this.users = [
+        new User(7, 'James Clerk Maxwell', 'james', 'United Kingdom'),
+        new User(8, 'Michael Faraday', 'michael', 'United Kingdom'),
+        new User(9, 'Richard Feynman', 'richard', 'USA'),
+        new User(10, 'Ernest Rutherford', 'ernest', 'New Zealand'),
+      ]
+      this.cdr.markForCheck()
+    }, 5000)
   }
 }

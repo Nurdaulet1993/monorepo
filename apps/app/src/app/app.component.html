@@ -4,11 +4,18 @@
                (opened)="onOpen()"
                (closed)="onClosed()"
                (selectionChanged)="onSelect($event)"
+               class="block mb-5"
     >
-      <ui-option value="1">Placeholder value 1</ui-option>
-      <ui-option value="2" disabled>Placeholder value 2</ui-option>
-      <ui-option value="3">Placeholder value 3</ui-option>
-      <ui-option value="4">Placeholder value 4</ui-option>
+      <ui-option [value]="1">Placeholder value 1</ui-option>
+      <ui-option [value]="2" disabled>Placeholder value 2</ui-option>
+      <ui-option [value]="3">Placeholder value 3</ui-option>
+      <ui-option [value]="4">Placeholder value 4</ui-option>
+    </ui-select>
+
+    <ui-select [value]="selectValue">
+      @for (user of users; track user.id) {
+        <ui-option [value]="user.id">{{ user.name }}</ui-option>
+      }
     </ui-select>
   </div>
 </div>
