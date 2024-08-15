@@ -85,7 +85,6 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   }
 
   ngAfterContentInit(): void {
-
     this.selectionModel.changed
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(values => {
@@ -96,7 +95,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     this.options.changes
       .pipe(
         startWith<QueryList<OptionComponent<T>>>(this.options),
-        tap(() => queueMicrotask(() => this.highlightSelectedOption(this.value))),
+        tap(() => queueMicrotask(() => this.highlightSelectedOption())),
         switchMap(options => merge(...options.map(o => o.selected))),
         takeUntil(this.unsubscribe$)
       )
@@ -108,8 +107,14 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     this.unsubscribe$.complete();
   }
 
-  private highlightSelectedOption(value: SelectValue<T>) {
-    this.findOptionByValue(value)?.highlightAsSelected();
+  private highlightSelectedOption() {
+    const valuesWithUpdatedReferences = this.selectionModel.selected.map(value => {
+      const correspondingOption = this.findOptionByValue(value);
+      return correspondingOption ? correspondingOption.value! : value;
+    });
+    this.selectionModel.clear();
+    this.selectionModel.select(...valuesWithUpdatedReferences);
+    // this.findOptionByValue(value)?.highlightAsSelected();
   }
 
   private findOptionByValue(value: SelectValue<T>): OptionComponent<T> | undefined {
@@ -127,7 +132,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['compareWith']) {
       this.selectionModel.compareWith = changes['compareWith'].currentValue;
-      this.highlightSelectedOption(this.value);
+      this.highlightSelectedOption();
     }
   }
 }
