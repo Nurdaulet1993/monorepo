@@ -1,11 +1,11 @@
 import {
-  AfterContentInit,
+  AfterContentInit, Attribute,
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ContentChildren,
   EventEmitter, inject,
   Input, OnChanges,
-  OnDestroy,
+  OnDestroy, OnInit,
   Output,
   QueryList, SimpleChanges
 } from '@angular/core';
@@ -14,8 +14,9 @@ import { animate, AnimationEvent, state, style, transition, trigger } from '@ang
 import { OptionComponent } from './option/option.component';
 import { SelectionModel } from '@angular/cdk/collections';
 import { merge, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
-export type SelectValue<T> = T | null;
+export type SelectValue<T> = T | T[] | null;
 
 @Component({
   selector: 'ui-select',
@@ -38,18 +39,26 @@ export type SelectValue<T> = T | null;
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges {
+export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges, OnInit {
   @Input() label: string = 'Select value ...';
   @Input()
   set value (value: SelectValue<T>) {
     this.selectionModel.clear();
     if (value) {
-      this.selectionModel.select(value);
+      if (Array.isArray(value)) {
+        this.selectionModel.select(...value);
+      } else {
+        this.selectionModel.select(value);
+      }
+
     }
   }
   get value(): SelectValue<T> {
     if (this.selectionModel.isEmpty()) return null;
-    return this.selectionModel.selected[0]
+    if (this.selectionModel.isMultipleSelection()) {
+      return this.selectionModel.selected;
+    }
+    return this.selectionModel.selected[0];
   }
   @Input() isOpen = false;
   @Input() displayWith: ((value: T) => string | number) | null = null;
@@ -58,13 +67,21 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   @Output() closed = new EventEmitter<void>();
   @Output() selectionChanged = new EventEmitter<SelectValue<T>>();
   @ContentChildren(OptionComponent, { descendants: true }) options!: QueryList<OptionComponent<T>>;
-  private selectionModel = new SelectionModel<T>();
+  private selectionModel!: SelectionModel<T>;
   private unsubscribe$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private optionMap = new Map<T | null, OptionComponent<T>>();
 
+  constructor(@Attribute('multiple') private multiple: string) {
+    this.selectionModel = new SelectionModel<T>(coerceBooleanProperty(this.multiple))
+  }
+
   protected get displayValue() {
     if (this.displayWith && this.value) {
+      if (Array.isArray(this.value)) {
+        return this.value.map(this.displayWith);
+      }
+
       return this.displayWith(this.value);
     }
 
@@ -123,7 +140,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     this.selectionModel.select(...valuesWithUpdatedReferences);
   }
 
-  private findOptionByValue(value: SelectValue<T>): OptionComponent<T> | undefined {
+  private findOptionByValue(value: T | null): OptionComponent<T> | undefined {
     if (this.optionMap.has(value)) return this.optionMap.get(value);
     return this.options && this.options.find(option => this.compareWith(option.value, value));
   }
@@ -141,5 +158,9 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
       this.selectionModel.compareWith = changes['compareWith'].currentValue;
       this.highlightSelectedOption();
     }
+  }
+
+  ngOnInit(): void {
+    // this.selectionModel = new SelectionModel<T>(this.multiple)
   }
 }
