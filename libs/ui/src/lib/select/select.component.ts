@@ -150,7 +150,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
       this.selectionModel.toggle(option.value);
       this.selectionChanged.emit(this.value);
     }
-    this.close();
+    if (!this.selectionModel.isMultipleSelection()) this.close();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
