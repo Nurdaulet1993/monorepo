@@ -1,0 +1,19 @@
+:host {
+  @apply transition-all ease-in-out duration-300;
+
+  &:not(.disabled) {
+    cursor: pointer;
+  }
+
+  &:hover:not(.disabled) {
+    @apply bg-gray-100;
+  }
+
+  &.selected {
+    @apply text-red-500;
+  }
+
+  &.disabled {
+    @apply text-gray-200;
+  }
+}

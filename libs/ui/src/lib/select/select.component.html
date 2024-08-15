@@ -1,0 +1,18 @@
+<div class="control" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+  <div class="label">{{ label }}</div>
+</div>
+
+<ng-template cdkConnectedOverlay
+             [cdkConnectedOverlayOrigin]="trigger"
+             [cdkConnectedOverlayOpen]="isOpen"
+             [cdkConnectedOverlayOffsetY]="5"
+             cdkConnectedOverlayHasBackdrop="true"
+             cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+             (backdropClick)="close()"
+             (detach)="close()"
+
+>
+  <div class="border border-gray-300 py-2 rounded bg-white" @dropDown (@dropDown.done)="onPanelAnimationDone($event)">
+    <ng-content></ng-content>
+  </div>
+</ng-template>
