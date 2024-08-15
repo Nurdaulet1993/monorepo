@@ -27,7 +27,10 @@ export class AppComponent implements OnInit {
     new User(9, 'Richard Feynman', 'richard', 'USA'),
     new User(10, 'Ernest Rutherford', 'ernest', 'New Zealand'),
   ];
-  selectValue: User = new User(3, 'Marie Curie', 'marie', 'Poland/French');
+  selectValue: SelectValue<User> = [
+    new User(3, 'Marie Curie', 'marie', 'Poland/French'),
+    new User(7, 'James Clerk Maxwell', 'james', 'United Kingdom'),
+  ]
 
   displayWith(user: User): string {
     return user.name;
