@@ -61,6 +61,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   private selectionModel = new SelectionModel<T>();
   private unsubscribe$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
+  private optionMap = new Map<T | null, OptionComponent<T>>();
 
   protected get displayValue() {
     if (this.displayWith && this.value) {
@@ -88,13 +89,14 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     this.selectionModel.changed
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(values => {
-        values.removed.forEach(value => this.findOptionByValue(value)?.deselect());
-        values.added.forEach(value => this.findOptionByValue(value)?.highlightAsSelected()); // If value changes after some time
+        values.removed.forEach(value => this.optionMap.get(value)?.deselect());
+        values.added.forEach(value => this.optionMap.get(value)?.highlightAsSelected()); // If value changes after some time
       })
 
     this.options.changes
       .pipe(
         startWith<QueryList<OptionComponent<T>>>(this.options),
+        tap(() => this.refreshOptionMap()),
         tap(() => queueMicrotask(() => this.highlightSelectedOption())),
         switchMap(options => merge(...options.map(o => o.selected))),
         takeUntil(this.unsubscribe$)
@@ -107,6 +109,11 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     this.unsubscribe$.complete();
   }
 
+  private refreshOptionMap() {
+    this.optionMap.clear();
+    this.options.forEach(option => this.optionMap.set(option.value, option))
+  }
+
   private highlightSelectedOption() {
     const valuesWithUpdatedReferences = this.selectionModel.selected.map(value => {
       const correspondingOption = this.findOptionByValue(value);
@@ -114,10 +121,10 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     });
     this.selectionModel.clear();
     this.selectionModel.select(...valuesWithUpdatedReferences);
-    // this.findOptionByValue(value)?.highlightAsSelected();
   }
 
   private findOptionByValue(value: SelectValue<T>): OptionComponent<T> | undefined {
+    if (this.optionMap.has(value)) return this.optionMap.get(value);
     return this.options && this.options.find(option => this.compareWith(option.value, value));
   }
 
