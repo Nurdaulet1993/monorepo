@@ -27,10 +27,14 @@ export class AppComponent implements OnInit {
     new User(9, 'Richard Feynman', 'richard', 'USA'),
     new User(10, 'Ernest Rutherford', 'ernest', 'New Zealand'),
   ];
-  selectValue: User = this.users[3];
+  selectValue: User = new User(3, 'Marie Curie', 'marie', 'Poland/French');
 
   displayWith(user: User): string {
     return user.name;
+  }
+
+  compareWith(user1: User | null, user2: User | null): boolean {
+    return user1?.id === user2?.id;
   }
 
   onOpen() {

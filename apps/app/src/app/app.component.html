@@ -12,7 +12,11 @@
 <!--      <ui-option [value]="4">Placeholder value 4</ui-option>-->
 <!--    </ui-select>-->
 
-    <ui-select [value]="selectValue" [displayWith]="displayWith">
+    <ui-select label="Select user..."
+               [value]="selectValue"
+               [displayWith]="displayWith"
+               [compareWith]="compareWith"
+    >
       @for (user of users; track user.id) {
         <ui-option [value]="user">{{ user.name }}</ui-option>
       }

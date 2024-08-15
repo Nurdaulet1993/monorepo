@@ -4,10 +4,10 @@ import {
   Component,
   ContentChildren,
   EventEmitter, inject,
-  Input,
+  Input, OnChanges,
   OnDestroy,
   Output,
-  QueryList
+  QueryList, SimpleChanges
 } from '@angular/core';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { animate, AnimationEvent, state, style, transition, trigger } from '@angular/animations';
@@ -38,7 +38,7 @@ export type SelectValue<T> = T | null;
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SelectComponent<T> implements AfterContentInit, OnDestroy {
+export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges {
   @Input() label: string = 'Select value ...';
   @Input()
   set value (value: SelectValue<T>) {
@@ -53,6 +53,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy {
   }
   @Input() isOpen = false;
   @Input() displayWith: ((value: T) => string | number) | null = null;
+  @Input() compareWith: (value1: T | null, value2: T | null) => boolean = (v1, v2) => v1 === v2;
   @Output() opened = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
   @Output() selectionChanged = new EventEmitter<SelectValue<T>>();
@@ -112,7 +113,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy {
   }
 
   private findOptionByValue(value: SelectValue<T>): OptionComponent<T> | undefined {
-    return this.options && this.options.find(option => option.value === value);
+    return this.options && this.options.find(option => this.compareWith(option.value, value));
   }
 
   private handleSelection(option: OptionComponent<T>): void {
@@ -121,5 +122,12 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy {
       this.selectionChanged.emit(this.value);
     }
     this.close();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['compareWith']) {
+      this.selectionModel.compareWith = changes['compareWith'].currentValue;
+      this.highlightSelectedOption(this.value);
+    }
   }
 }
