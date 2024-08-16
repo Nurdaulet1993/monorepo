@@ -1,11 +1,11 @@
 <div class="control" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
   @if (value) {
-    {{ displayValue }}
+    <div class="value">{{ displayValue }}</div>
   } @else {
     <div class="label">{{ label }}</div>
   }
   @if (value) {
-    <button class="btn-clear p-1 bg-gray-300 rounded" (click)="clear($event)">
+    <button class="btn-clear bg-gray-300" (click)="clear($event)">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
       </svg>

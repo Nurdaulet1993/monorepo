@@ -1,13 +1,20 @@
+:host {
+  color: #B3B3B3;
+  font-size: 14px;
+}
+
 :host.open .control {
     position: relative;
     z-index: 1001;
 }
 
 .control {
-  @apply  border border-gray-300 rounded py-2 px-4;
+  padding: 4px 8px;
   display: grid;
+  gap: 10px;
   grid-template-columns: 1fr max-content;
   align-items: center;
+  background-color: #222222;
 }
 
 .btn-clear {}
@@ -15,4 +22,9 @@
 .select-options {
   max-height: 200px;
   overflow-y: auto;
+}
+
+.value {
+  //white-space: nowrap;
+  //overflow-x: hidden;
 }

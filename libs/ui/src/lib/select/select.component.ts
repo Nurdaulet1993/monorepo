@@ -1,5 +1,5 @@
 import {
-  AfterContentInit, Attribute,
+  AfterContentInit, AfterViewInit, Attribute,
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ContentChildren, ElementRef,
@@ -40,7 +40,7 @@ export type SelectValue<T> = T | T[] | null;
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges, OnInit {
+export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges, OnInit, AfterViewInit {
   @Input() label: string = 'Select value ...';
   @Input()
   set value (value: SelectValue<T>) {
@@ -74,7 +74,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   private optionMap = new Map<T | null, OptionComponent<T>>();
 
   private el = inject(ElementRef);
-  overlayWidth: number = this.el.nativeElement.offsetWidth;
+  overlayWidth: number = 0;
 
   constructor(@Attribute('multiple') private multiple: string) {
     this.selectionModel = new SelectionModel<T>(coerceBooleanProperty(this.multiple))
@@ -176,5 +176,9 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     event.stopPropagation();
     this.selectionModel.clear();
     this.selectionChanged.emit(this.value);
+  }
+
+  ngAfterViewInit(): void {
+    this.overlayWidth = this.el.nativeElement.offsetWidth;
   }
 }
