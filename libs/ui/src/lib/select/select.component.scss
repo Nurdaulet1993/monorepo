@@ -10,5 +10,9 @@
   align-items: center;
 }
 
-.btn-clear {
+.btn-clear {}
+
+.select-options {
+  max-height: 200px;
+  overflow-y: auto;
 }

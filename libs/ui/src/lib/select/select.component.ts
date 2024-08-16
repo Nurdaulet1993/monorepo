@@ -2,7 +2,7 @@ import {
   AfterContentInit, Attribute,
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
-  ContentChildren,
+  ContentChildren, ElementRef,
   EventEmitter, inject,
   Input, OnChanges,
   OnDestroy, OnInit,
@@ -72,6 +72,9 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   private unsubscribe$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private optionMap = new Map<T | null, OptionComponent<T>>();
+
+  private el = inject(ElementRef);
+  overlayWidth: number = this.el.nativeElement.offsetWidth;
 
   constructor(@Attribute('multiple') private multiple: string) {
     this.selectionModel = new SelectionModel<T>(coerceBooleanProperty(this.multiple))

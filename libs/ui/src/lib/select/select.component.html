@@ -24,7 +24,11 @@
              (detach)="close()"
 
 >
-  <div class="border border-gray-300 py-2 rounded bg-white" @dropDown (@dropDown.done)="onPanelAnimationDone($event)">
+  <div class="border border-gray-300 py-2 rounded bg-white select-options"
+       [style.width.px]="overlayWidth"
+       @dropDown
+       (@dropDown.done)="onPanelAnimationDone($event)"
+  >
     <ng-content></ng-content>
   </div>
 </ng-template>
