@@ -8,6 +8,7 @@ import {
   Input,
   Output
 } from '@angular/core';
+import { SelectComponent } from '../select.component';
 
 @Component({
   selector: 'ui-option',
@@ -29,6 +30,8 @@ export class OptionComponent<T> {
   @Output() selected = new EventEmitter<OptionComponent<T>>();
   protected isSelected = false;
   private cdr = inject(ChangeDetectorRef);
+  private selectComp = inject(SelectComponent);
+  isMultiselect = this.selectComp.isMultiSelect;
 
   protected select(): void {
     if (this.isDisabled) return;

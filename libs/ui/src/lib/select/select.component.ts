@@ -89,6 +89,10 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     return this.value;
   }
 
+  get isMultiSelect(): boolean {
+    return this.selectionModel.isMultipleSelection();
+  }
+
   open(): void {
     this.isOpen = true;
   }

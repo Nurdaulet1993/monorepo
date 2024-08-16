@@ -13,9 +13,9 @@
 <!--    </ui-select>-->
 
     <ui-select label="Select user..."
-               [value]="selectValue"
                [displayWith]="displayWith"
                [compareWith]="compareWith"
+               [value]="selectValue"
                class="block mb-5"
                multiple
     >
@@ -24,5 +24,14 @@
       }
     </ui-select>
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+    <ui-select label="Select user..."
+               [displayWith]="displayWith"
+               [compareWith]="compareWith"
+               class="block mb-5"
+    >
+      @for (user of users; track user.id) {
+        <ui-option [value]="user">{{ user.name }}</ui-option>
+      }
+    </ui-select>
   </div>
 </div>
