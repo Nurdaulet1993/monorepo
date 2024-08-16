@@ -27,7 +27,8 @@ export type SelectValue<T> = T | T[] | null;
   templateUrl: './select.component.html',
   styleUrl: './select.component.scss',
   host: {
-    '(click)': 'open()'
+    '(click)': 'open()',
+    '[class.open]': 'isOpen'
   },
   animations: [
     trigger('dropDown', [
@@ -162,5 +163,11 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
 
   ngOnInit(): void {
     // this.selectionModel = new SelectionModel<T>(this.multiple)
+  }
+
+  clear(event: MouseEvent) {
+    event.stopPropagation();
+    this.selectionModel.clear();
+    this.selectionChanged.emit(this.value);
   }
 }
