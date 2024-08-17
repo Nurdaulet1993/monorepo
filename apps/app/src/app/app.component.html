@@ -15,10 +15,9 @@
     <ui-select label="Select user..."
                [displayWith]="displayWith"
                [compareWith]="compareWith"
-               [value]="selectValue"
+               [formControl]="control"
                class="block mb-5"
                multiple
-               disabled
     >
       @for (user of users; track user.id) {
         <ui-option [value]="user">{{ user.name }}</ui-option>

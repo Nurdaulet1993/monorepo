@@ -15,6 +15,7 @@ import { OptionComponent } from './option/option.component';
 import { SelectionModel } from '@angular/cdk/collections';
 import { merge, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 export type SelectValue<T> = T | T[] | null;
 
@@ -26,6 +27,13 @@ export type SelectValue<T> = T | T[] | null;
   ],
   templateUrl: './select.component.html',
   styleUrl: './select.component.scss',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: SelectComponent,
+      multi: true
+    }
+  ],
   host: {
     '(click)': 'open()',
     '[class.open]': 'isOpen',
@@ -41,19 +49,13 @@ export type SelectValue<T> = T | T[] | null;
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges, AfterViewInit {
+export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges, AfterViewInit, ControlValueAccessor {
   @Input() label: string = 'Select value ...';
   @Input()
   set value (value: SelectValue<T>) {
-    this.selectionModel.clear();
-    if (value) {
-      if (Array.isArray(value)) {
-        this.selectionModel.select(...value);
-      } else {
-        this.selectionModel.select(value);
-      }
-
-    }
+    this.setValue(value);
+    this.onChange(this.value);
+    this.highlightSelectedOption();
   }
   get value(): SelectValue<T> {
     if (this.selectionModel.isEmpty()) return null;
@@ -161,6 +163,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     if (option.value) {
       this.selectionModel.toggle(option.value);
       this.selectionChanged.emit(this.value);
+      this.onChange(this.value);
     }
     if (!this.selectionModel.isMultipleSelection()) this.close();
   }
@@ -177,9 +180,35 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     event.stopPropagation();
     this.selectionModel.clear();
     this.selectionChanged.emit(this.value);
+    this.onChange(this.value);
   }
+
+  setValue(value: SelectValue<T>) {
+    this.selectionModel.clear();
+    if (!value) return;
+    Array.isArray(value)
+      ? this.selectionModel.select(...value)
+      : this.selectionModel.select(value);
+  }
+
+  protected onChange: (newValue: SelectValue<T>) => void = () => {};
 
   ngAfterViewInit(): void {
     this.overlayWidth = this.el.nativeElement.offsetWidth;
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+  }
+
+  writeValue(value: SelectValue<T>): void {
+    this.setValue(value);
+    this.highlightSelectedOption();
   }
 }

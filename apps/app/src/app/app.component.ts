@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit }
 import { RouterModule } from '@angular/router';
 import { CardComponent, OptionComponent, SelectComponent, TabsComponent, TabsItemComponent, SelectValue } from '@ui';
 import { User } from './user';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
-  imports: [RouterModule, CardComponent, TabsComponent, TabsItemComponent, SelectComponent, OptionComponent],
+  imports: [RouterModule, CardComponent, TabsComponent, TabsItemComponent, SelectComponent, OptionComponent, ReactiveFormsModule],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -13,6 +14,8 @@ import { User } from './user';
 })
 export class AppComponent implements OnInit {
   title = 'app';
+
+  control = new FormControl(new User(2, 'Niels Bohr', 'niels', 'Denmark'))
 
   private cdr = inject(ChangeDetectorRef);
   users: User[] = [
@@ -54,6 +57,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.control.valueChanges.subscribe(console.log)
     // setTimeout(() => {
     //   this.selectValue = new User(8, 'Michael Faraday', 'michael', 'United Kingdom');
     //   this.users = [
