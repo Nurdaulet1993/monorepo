@@ -1,5 +1,5 @@
 import {
-  AfterContentInit, AfterViewInit, Attribute,
+  AfterContentInit, AfterViewInit, Attribute, booleanAttribute,
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ContentChildren, ElementRef,
@@ -28,7 +28,8 @@ export type SelectValue<T> = T | T[] | null;
   styleUrl: './select.component.scss',
   host: {
     '(click)': 'open()',
-    '[class.open]': 'isOpen'
+    '[class.open]': 'isOpen',
+    '[class.disabled]': 'isDisabled',
   },
   animations: [
     trigger('dropDown', [
@@ -40,7 +41,7 @@ export type SelectValue<T> = T | T[] | null;
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges, OnInit, AfterViewInit {
+export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChanges, AfterViewInit {
   @Input() label: string = 'Select value ...';
   @Input()
   set value (value: SelectValue<T>) {
@@ -61,7 +62,8 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     }
     return this.selectionModel.selected[0];
   }
-  @Input() isOpen = false;
+  @Input({ transform: booleanAttribute, alias: 'opened' }) isOpen = false;
+  @Input({ transform: booleanAttribute, alias: 'disabled' }) isDisabled = false;
   @Input() displayWith: ((value: T) => string | number) | null = null;
   @Input() compareWith: (value1: T | null, value2: T | null) => boolean = (v1, v2) => v1 === v2;
   @Output() opened = new EventEmitter<void>();
@@ -97,6 +99,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   }
 
   open(): void {
+    if (this.isDisabled) return;
     this.isOpen = true;
   }
 
@@ -154,6 +157,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   }
 
   private handleSelection(option: OptionComponent<T>): void {
+    if (this.isDisabled) return;
     if (option.value) {
       this.selectionModel.toggle(option.value);
       this.selectionChanged.emit(this.value);
@@ -168,11 +172,8 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     }
   }
 
-  ngOnInit(): void {
-    // this.selectionModel = new SelectionModel<T>(this.multiple)
-  }
-
   clear(event: MouseEvent) {
+    if (this.isDisabled) return;
     event.stopPropagation();
     this.selectionModel.clear();
     this.selectionChanged.emit(this.value);

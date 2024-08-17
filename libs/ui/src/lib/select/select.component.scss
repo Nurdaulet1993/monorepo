@@ -1,6 +1,12 @@
 :host {
   color: #B3B3B3;
   font-size: 14px;
+
+  &.disabled .control {
+    pointer-events: none;
+    opacity: .5;
+    user-select: none;
+  }
 }
 
 :host.open .control {
@@ -9,12 +15,13 @@
 }
 
 .control {
+  @apply border border-gray-200 rounded;
   padding: 4px 8px;
   display: grid;
   gap: 10px;
   grid-template-columns: 1fr max-content;
   align-items: center;
-  background-color: #222222;
+  cursor: pointer;
 }
 
 .btn-clear {}
