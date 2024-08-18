@@ -15,7 +15,10 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 export class AppComponent implements OnInit {
   title = 'app';
 
-  control = new FormControl(new User(2, 'Niels Bohr', 'niels', 'Denmark'))
+  control = new FormControl({
+    value: new User(2, 'Niels Bohr', 'niels', 'Denmark'),
+    disabled: false
+  })
 
   private cdr = inject(ChangeDetectorRef);
   users: User[] = [

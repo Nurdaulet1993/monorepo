@@ -36,8 +36,10 @@ export type SelectValue<T> = T | T[] | null;
   ],
   host: {
     '(click)': 'open()',
+    '(blur)': 'markAsTouched()',
     '[class.open]': 'isOpen',
     '[class.disabled]': 'isDisabled',
+    '[tabIndex]': 'tabIndex',
   },
   animations: [
     trigger('dropDown', [
@@ -64,6 +66,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     }
     return this.selectionModel.selected[0];
   }
+  @Input() tabIndex = 0;
   @Input({ transform: booleanAttribute, alias: 'opened' }) isOpen = false;
   @Input({ transform: booleanAttribute, alias: 'disabled' }) isDisabled = false;
   @Input() displayWith: ((value: T) => string | number) | null = null;
@@ -86,11 +89,9 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
 
   protected get displayValue() {
     if (this.displayWith && this.value) {
-      if (Array.isArray(this.value)) {
-        return this.value.map(this.displayWith);
-      }
-
-      return this.displayWith(this.value);
+      return Array.isArray(this.value)
+        ? this.value.map(this.displayWith)
+        : this.displayWith(this.value);
     }
 
     return this.value;
@@ -103,11 +104,13 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   open(): void {
     if (this.isDisabled) return;
     this.isOpen = true;
+    this.cdr.markForCheck();
   }
 
   close(): void {
     this.isOpen = false;
-    this.cdr.markForCheck();
+    this.onTouched();
+    // this.cdr.markForCheck();
   }
 
   onPanelAnimationDone({ fromState, toState }: AnimationEvent): void {
@@ -139,7 +142,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     this.unsubscribe$.complete();
   }
 
-  private refreshOptionMap() {
+  private refreshOptionMap(): void {
     this.optionMap.clear();
     this.options.forEach(option => this.optionMap.set(option.value, option))
   }
@@ -181,9 +184,10 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
     this.selectionModel.clear();
     this.selectionChanged.emit(this.value);
     this.onChange(this.value);
+    this.cdr.markForCheck();
   }
 
-  setValue(value: SelectValue<T>) {
+  setValue(value: SelectValue<T>): void {
     this.selectionModel.clear();
     if (!value) return;
     Array.isArray(value)
@@ -191,7 +195,15 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
       : this.selectionModel.select(value);
   }
 
+  markAsTouched(): void {
+    if (this.isDisabled && !this.isOpen) return;
+    this.onTouched();
+    this.cdr.markForCheck();
+  }
+
+  // Control Value Accessor
   protected onChange: (newValue: SelectValue<T>) => void = () => {};
+  protected onTouched: () => void = () => {};
 
   ngAfterViewInit(): void {
     this.overlayWidth = this.el.nativeElement.offsetWidth;
@@ -202,13 +214,17 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   }
 
   registerOnTouched(fn: any): void {
+    this.onTouched = fn;
   }
 
   setDisabledState(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+    this.cdr.markForCheck();
   }
 
   writeValue(value: SelectValue<T>): void {
     this.setValue(value);
     this.highlightSelectedOption();
+    this.cdr.markForCheck();
   }
 }
