@@ -5,7 +5,7 @@ import {
   ContentChildren, ElementRef,
   EventEmitter, inject,
   Input, OnChanges,
-  OnDestroy, OnInit,
+  OnDestroy,
   Output,
   QueryList, SimpleChanges
 } from '@angular/core';
@@ -110,7 +110,7 @@ export class SelectComponent<T> implements AfterContentInit, OnDestroy, OnChange
   close(): void {
     this.isOpen = false;
     this.onTouched();
-    // this.cdr.markForCheck();
+    this.cdr.markForCheck();
   }
 
   onPanelAnimationDone({ fromState, toState }: AnimationEvent): void {
