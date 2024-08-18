@@ -6,7 +6,15 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
-  imports: [RouterModule, CardComponent, TabsComponent, TabsItemComponent, SelectComponent, OptionComponent, ReactiveFormsModule],
+  imports: [
+    RouterModule,
+    CardComponent,
+    TabsComponent,
+    TabsItemComponent,
+    SelectComponent,
+    OptionComponent,
+    ReactiveFormsModule
+  ],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
