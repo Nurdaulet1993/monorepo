@@ -10,7 +10,7 @@
   }
 
   &.selected {
-    @apply text-red-500;
+    @apply bg-gray-100;
   }
 
   &.disabled {
